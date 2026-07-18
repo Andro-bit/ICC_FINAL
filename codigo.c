@@ -3,6 +3,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#include <stdbool.h>
+
 
 FILE *sales;
 
@@ -17,6 +19,8 @@ typedef struct
     float devolucion;
 
 }VENTA;
+
+VENTA venta;
 
 typedef struct
 {
@@ -42,47 +46,144 @@ typedef struct
 
 CAJA caja;
 
-void FnSorting();
+void FnSorting(int IN, bool ADD);
+void ApCiCaja(int N);
+void Apcaja();
+void CiCaja();
+void Ventas();
+void REGISventas();
 
 int main()
 {
-
-    FnSorting();
+    // el menu lo hace samilka por eso puse 1 (ง🔥ﾛ🔥)ง
+    ApCiCaja(1);
+    REGISventas();
+    return 0;
 }
 
 void ApCiCaja(int N) {
 
-    // incializar los valores
-
-    caja.secuencia = 1000;
-    strcpy(caja.fecha, "N/A");
     switch (N) {
-        case 1: caja.operacion = 'A'; break;
+        case 1: caja.operacion = 'A'; Apcaja(); break;
         case 2: caja.operacion = 'C'; break;
-        default: break;
+        default: caja.operacion = '?'; break;
     }
-    caja.efectivo = 0;
-    caja.tarjeta = 0;
+    
+    caja.secuencia = 1000; //debe incrementar cada apertura..
+    strcpy(caja.fecha, "N/A"); //fecha basado con time.h
+    caja.efectivo = 0.0f;
+    caja.tarjeta = 0.0f;
 
-    // cantidad de billetes y monedas que se multiplicara por su valor correspondiente
-    caja.m1 = 100;
-    caja.m5 = 100;
-    caja.m10 = 100;
-    caja.m25 = 100;
+    printf("Secuencia:                  %d\n"
+           "Operacion:                  %c\n"
+           "Fecha:                      %s\n"
+           "Monto Efectivo:             %.2f\n"
+           "Monto TC:                   %.2f\n",
+           caja.secuencia,
+           caja.operacion,
+           caja.fecha,
+           caja.efectivo,
+           caja.tarjeta);
 
-    caja.b50 = 50;
-    caja.b100 = 50;
-    caja.b200 = 50;
-
-    caja.b500 = 10;
-    caja.b1000 = 10;
-    caja.b2000 = 10;
+    printf("Denominaciones:\n"
+           "Monedas de 1:       %d     Monedas de 5:        %d\n"
+           "Monedas de 10:      %d     Monedas de 25:       %d\n"
+           "Billetes de 50:     %d     Billetes de 100:     %d\n"
+           "Billetes de 200:    %d     Billetes de 500:     %d\n"
+           "Billetes de 1000:   %d     Billetes de 2000:    %d\n",
+           caja.m1,
+           caja.m5,
+           caja.m10,
+           caja.m25,
+           caja.b50,
+           caja.b100,
+           caja.b200,
+           caja.b500,
+           caja.b1000,
+           caja.b2000);
 }
 
-void FnSorting()
+void Apcaja()
+{
+    int a;
+    printf("Ingrese denominaciones del dia:\n");
+
+    printf("Cuantas monedas de 1? ");
+    scanf("%d", &a);
+    caja.m1 = a;
+    printf("Cuantas monedas de 5? ");
+    scanf("%d", &a);
+    caja.m5 = a;
+    printf("Cuantas monedas de 10? ");
+    scanf("%d", &a);
+    caja.m10 = a;
+    printf("Cuantas monedas de 25? ");
+    scanf("%d", &a);
+    caja.m25 = a;
+    printf("Cuantos billetes de 50? ");
+    scanf("%d", &a);
+    caja.b50 = a;
+    printf("Cuantos billetes de 100? ");
+    scanf("%d", &a);
+    caja.b100 = a;
+    printf("Cuantos billetes de 200? ");
+    scanf("%d", &a);
+    caja.b200 = a;
+    printf("Cuantos billetes de 500? ");
+    scanf("%d", &a);
+    caja.b500 = a;
+    printf("Cuantos billetes de 1000? ");
+    scanf("%d", &a);
+    caja.b1000 = a;
+    printf("Cuantos billetes de 2000? ");
+    scanf("%d", &a);
+    caja.b2000 = a;
+}
+
+void CiCaja()
+{
+    
+}
+
+void Ventas()
 {
 
-    int Employee;
+    printf("Cuanto se pago?  "); //ej 200DOP
+    scanf("%f",&venta.pago); //no tengo internet pa ver lo de fgets
+    printf("Cuantos tickets se vendieron? "); //ej un ticket es 50DOP
+    scanf("%d",&venta.cantidad);
+
+    venta.precio = 50 * venta.cantidad; //EJ 3 tickets x 50DOP = 150DOP
+    venta.devolucion = venta.pago - venta.precio;
+    FnSorting(venta.pago,true); FnSorting(venta.devolucion,false);
+
+    //(venta.precio) incrementa el valor de un acumulador (ventas totales) para el reporte de ventas diarias! (ง🔥ﾛ🔥)ง
+    
+}
+
+void REGISventas(){
+
+    Ventas();
+     printf("Denominaciones:\n"
+           "Monedas de 1:       %d     Monedas de 5:        %d\n"
+           "Monedas de 10:      %d     Monedas de 25:       %d\n"
+           "Billetes de 50:     %d     Billetes de 100:     %d\n"
+           "Billetes de 200:    %d     Billetes de 500:     %d\n"
+           "Billetes de 1000:   %d     Billetes de 2000:    %d\n",
+           caja.m1,
+           caja.m5,
+           caja.m10,
+           caja.m25,
+           caja.b50,
+           caja.b100,
+           caja.b200,
+           caja.b500,
+           caja.b1000,
+           caja.b2000);
+}
+
+void FnSorting(int IN, bool ADD)
+{
     int pedrito,mirabal,catedral,gregorio,bluey,sanchez; int d1,d2,d3,d4,m;
     // Reset all bill counters to 0 for the NEW employee
     pedrito = 0; mirabal = 0; catedral = 0; gregorio = 0; bluey = 0; sanchez =0;
@@ -92,13 +193,11 @@ void FnSorting()
     //catedral = 50
     //gregorio = 25 
     //bluey = 2000 dop
-
-    printf("Inserta Valor: "); scanf("%d",&Employee);
    
-    d4 = (Employee % 10); //4 123.4
-    d3 = (Employee/10) % 10; //3 12.34
-    d2 = (Employee/100) % 10; //2 1.234
-    d1 = (Employee/1000); //1 0.1234
+    d4 = (IN % 10); //4 123.4
+    d3 = (IN/10) % 10; //3 12.34
+    d2 = (IN/100) % 10; //2 1.234
+    d1 = (IN/1000); //1 0.1234
 
     printf("%d%d%d%d ",d1,d2,d3,d4);
     
@@ -126,30 +225,40 @@ void FnSorting()
     if (d4 >= 5){d4 = d4-5; sanchez = 1;}
     
     
-    printf("Necesitas %d x2000 %dx1000, %dx500, %dx200, %dx100, %dx50 %dx25 %dx10 %dx5 y %d pesos\n\n", bluey,d1,pedrito,mirabal,d2,catedral,gregorio,d3,sanchez,d4);
+    //printf("Necesitas %d x2000 %dx1000, %dx500, %dx200, %dx100, %dx50 %dx25 %dx10 %dx5 y %d pesos\n\n", bluey,d1,pedrito,mirabal,d2,catedral,gregorio,d3,sanchez,d4);
 
-    caja.m1 = d4;
-    caja.m5 = sanchez;
-    caja.m10 = d3;
-    caja.m25 = gregorio;
+    //Billete de ingreso  - COSTO DE VENTA = DEVOLUCION
+    // Sorting(Billete de ingreso) & Sorting(Devolucion)
+    //agregar valores de Sorted BDI), Restar valores de sorted DEVOL
+    //Que billetes se pierden al hacer la devolucion?
 
-    caja.b50 = catedral;
-    caja.b100 = d2;
-    caja.b200 = mirabal;
+    if(ADD == true){ 
+    caja.m1 += d4;
+    caja.m5 += sanchez;
+    caja.m10 += d3;
+    caja.m25 += gregorio;
 
-    caja.b500 = pedrito;
-    caja.b1000 = d1;
-    caja.b2000 = bluey;
+    caja.b50 += catedral;
+    caja.b100 += d2;
+    caja.b200 += mirabal;
 
-    printf("Necesitas %d x2000 %dx1000, %dx500, %dx200, %dx100, %dx50 %dx25 %dx10 %dx5 y %d pesos\n\n",
-       caja.b2000,
-       caja.b1000,
-       caja.b500,
-       caja.b200,
-       caja.b100,
-       caja.b50,
-       caja.m25,
-       caja.m10,
-       caja.m5,
-       caja.m1);
+    caja.b500 += pedrito;
+    caja.b1000 += d1;
+    caja.b2000 += bluey;}
+    
+    else{
+    caja.m1 -= d4;
+    caja.m5 -= sanchez;
+    caja.m10 -= d3;
+    caja.m25 -= gregorio;
+
+    caja.b50 -= catedral;
+    caja.b100 -= d2;
+    caja.b200 -= mirabal;
+
+    caja.b500 -= pedrito;
+    caja.b1000 -= d1;
+    caja.b2000 -= bluey;
+    }
+
 }
