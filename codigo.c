@@ -52,13 +52,66 @@ void Apcaja();
 void CiCaja();
 void Ventas();
 void REGISventas();
+void menu();
 
 int main()
 {
-    // el menu lo hace samilka por eso puse 1 (ง🔥ﾛ🔥)ง
-    ApCiCaja(1);
-    REGISventas();
+    menu();
     return 0;
+}
+
+void menu() {
+    int opcion;
+
+    do{
+        //imprimir el menu de la boleteria 
+        printf("\n*** MODULO: Boleteria ***\n");
+        printf("Menu de opciones\n\n");
+        printf("1.Apertura de caja\n");
+        printf("2.Cierre de caja\n");
+        printf("3.Resgistro de ventas de boletas\n");
+        printf("4.Registro de ventas diarias\n");
+        printf("5.Salir\n\n");
+        printf("Seleccione una opcion: ");
+
+        //leer la opcion del usuario 
+        scanf("%d", &opcion);
+
+        while (opcion < 1 || opcion > 5) {
+            printf("\nEsa opcion no es valida. Intente de nuevo: ");
+            scanf("%d", &opcion);
+        }
+
+        //evaluar la opcion seleccionada
+        switch(opcion) {
+            case 1:
+            printf("\n[ejecutando] apertura de caja...\n"); ApCiCaja(opcion);
+            //logica para apertura de caja
+            break;
+            case 2:
+            printf("\n[ejecutando] cierre de caja...\n"); ApCiCaja(opcion);
+            //logica para cierre de caja 
+            break;
+            case 3:
+            printf("\n[ejecutando] registro de ventas de boletas...\n"); REGISventas();
+            break;
+            case 4:
+            printf("\n[ejecutando] generando reporte de ventas diarias...\n");
+            //logica para el reporte 
+            break;
+            case 5:
+            printf("\n saliendo del sistema. Hasta luego!");
+            break;
+            default:
+            printf("\n opcion no valida. Por favor, intente de nuevo.\n");
+            break;
+
+        }
+
+        printf ("-----------------------------------------\n");
+
+    } while(opcion != 5); // el ciclo se repite hasta que la opcion sea 5
+
 }
 
 void ApCiCaja(int N) {
@@ -198,8 +251,6 @@ void FnSorting(int IN, bool ADD)
     d3 = (IN/10) % 10; //3 12.34
     d2 = (IN/100) % 10; //2 1.234
     d1 = (IN/1000); //1 0.1234
-
-    printf("%d%d%d%d ",d1,d2,d3,d4);
     
     bluey = d1 / 2;
     d1 %= 2; //para los 2000
