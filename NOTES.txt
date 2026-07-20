@@ -1,0 +1,75 @@
+Cosas en cuenta para Apertura y cierre de caja
+El flujo es asi mas o menos
+
+case 1
+
+// Verificar que no exista una caja abierta
+
+// Obtener la siguiente secuencia
+
+// Marcar operación = 'A'
+
+// Llenar los datos de apertura
+
+// Guardar en caja.dat
+
+// Marcar caja como abierta
+
+//---------------------------------
+
+case 2
+
+// Verificar que sí exista una caja abierta
+
+// Mantener la misma secuencia
+
+// Marcar operación = 'C'
+
+// Llenar los datos del cierre
+
+// Guardar en caja.dat
+
+// Marcar caja como cerrada
+
+Por eso se crea la funcion guardar caja
+
+Daily sales va a funcionar asi
+*****************************************
+
+Caja #1000
+
+Fecha N/A
+
+--------------------------------
+
+Venta 1
+
+Venta 2
+
+Venta 3
+
+Venta 4
+
+Total efectivo
+
+Total tarjeta
+
+Total caja
+
+=================================
+
+Caja #1001
+
+Venta 1
+
+Venta 2
+
+Venta 3
+
+Total efectivo
+
+Total tarjeta
+
+Total caja
+
+=================================

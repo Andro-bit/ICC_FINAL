@@ -6,17 +6,18 @@
 #include <stdbool.h>
 
 
-FILE *sales;
 
 typedef struct
 {
-    int secuencia;
+    int secuencia; // Número de la apertura de caja a la que pertenece esta venta
     char fecha[11];
     int cantidad;
     float precio;
     char tipoPago;
     float pago;
     float devolucion;
+    int cash;
+    int card; // Para saber si el dinero fue recibido con efectivo o tarjeta
 
 }VENTA;
 
@@ -45,22 +46,26 @@ typedef struct
 }CAJA;
 
 CAJA caja;
-
+bool OpenSale = false;
 void FnSorting(int IN, bool ADD);
 void ApCiCaja(int N);
-void Apcaja();
-void CiCaja();
+void AperturaCaja();
+void CierreCaja();
 void Ventas();
 void REGISventas();
+void DailySales();
 void menu();
+void GuardarCaja();
 
 int main()
 {
+
     menu();
     return 0;
 }
 
 void menu() {
+
     int opcion;
 
     do{
@@ -69,7 +74,7 @@ void menu() {
         printf("Menu de opciones\n\n");
         printf("1.Apertura de caja\n");
         printf("2.Cierre de caja\n");
-        printf("3.Resgistro de ventas de boletas\n");
+        printf("3.Agregar ventas de boletas...\n");
         printf("4.Registro de ventas diarias\n");
         printf("5.Salir\n\n");
         printf("Seleccione una opcion: ");
@@ -93,10 +98,10 @@ void menu() {
             //logica para cierre de caja 
             break;
             case 3:
-            printf("\n[ejecutando] registro de ventas de boletas...\n"); REGISventas();
+            printf("\n[ejecutando] Agregar ventas de boletas...\n"); REGISventas();
             break;
             case 4:
-            printf("\n[ejecutando] generando reporte de ventas diarias...\n");
+            printf("\n[ejecutando] generando reporte de ventas diarias...\n"); DailySales();
             //logica para el reporte 
             break;
             case 5:
@@ -116,18 +121,40 @@ void menu() {
 
 void ApCiCaja(int N) {
 
+    int nextSequence = 1000; // esto es para que la secuencia vaya aumentando
+
+    // hice estos cambios because in order de hacer el reporte diario de ventas
+    // necesito que las secuencias se registren y se guarden, ademas de que
+    // yo cada venta la ire registrando por apertura y cierre so aja.
     switch (N) {
-        case 1: caja.operacion = 'A'; Apcaja(); break;
-        case 2: caja.operacion = 'C'; break;
+        case 1:
+            if (!OpenSale) {
+                caja.operacion = 'A';
+                caja.secuencia = nextSequence;
+                AperturaCaja();
+                GuardarCaja();
+                OpenSale = true;
+                nextSequence++;
+            } else printf("La caja ya esta abierta bro");
+            break;
+        case 2:
+            if (OpenSale) {
+                caja.operacion = 'C';
+                CierreCaja();
+                GuardarCaja();
+                OpenSale = false;
+                break;
+            }
         default: caja.operacion = '?'; break;
     }
     
-    caja.secuencia = 1000; //debe incrementar cada apertura..
+
     strcpy(caja.fecha, "N/A"); //fecha basado con time.h
     caja.efectivo = 0.0f;
     caja.tarjeta = 0.0f;
 
-    printf("Secuencia:                  %d\n"
+    printf(
+    "Secuencia:                  %d\n"
            "Operacion:                  %c\n"
            "Fecha:                      %s\n"
            "Monto Efectivo:             %.2f\n"
@@ -156,7 +183,7 @@ void ApCiCaja(int N) {
            caja.b2000);
 }
 
-void Apcaja()
+void AperturaCaja()
 {
     int a;
     printf("Ingrese denominaciones del dia:\n");
@@ -193,46 +220,148 @@ void Apcaja()
     caja.b2000 = a;
 }
 
-void CiCaja()
+void CierreCaja()
 {
     
 }
 
+void GuardarCaja() {
+    FILE *archivoCaja = fopen("caja.dat", "ab");
+    if (archivoCaja == NULL) {
+        printf("Error al abrir caja.dat\n");
+        return;
+    }
+    fwrite(&caja, sizeof(CAJA), 1, archivoCaja);
+    // escribir caja en archivo caja
+    fclose(archivoCaja);
+}
+
+void DailySales() {
+    // Abrir el archivo binario de ventas en modo lectura
+    // Verificar si el archivo existe
+    // Si el archivo no existe, mostrar un mensaje y terminar la función
+
+    // Imprimir el encabezado del reporte
+
+    // Inicializar:
+    //     cajaAnterior = -1
+    //     totalEfectivo = 0
+    //     totalTarjeta = 0
+    //     totalGeneral = 0
+
+    // Leer el primer registro de venta
+
+    // Mientras exista una venta válida
+
+    // Si la secuencia de la venta es diferente de cajaAnterior
+
+    // Si NO es la primera caja encontrada
+
+    // Imprimir el total de efectivo de la caja anterior
+    // Imprimir el total de tarjeta de la caja anterior
+    // Imprimir el total general de la caja anterior
+    // Imprimir una línea separadora
+
+    // Actualizar cajaAnterior con la nueva secuencia
+
+    // Reiniciar:
+    //     totalEfectivo = 0
+    //     totalTarjeta = 0
+    //     totalGeneral = 0
+
+    // Imprimir:
+    //     Número de caja
+    //     Fecha (N/A por ahora)
+
+    // Imprimir los datos de la venta:
+    //     Cantidad de boletos
+    //     Precio
+    //     Forma de pago
+    //     Pago recibido
+    //     Devolución
+
+    // Sumar el efectivo recibido al totalEfectivo
+
+    // Sumar los pagos con tarjeta al totalTarjeta
+
+    // Sumar el valor de la venta al totalGeneral
+
+    // Leer la siguiente venta
+
+    // Al terminar el recorrido
+
+    // Si se imprimió al menos una caja
+
+    // Imprimir los totales de la última caja
+
+    // Cerrar el archivo
+
+    // Finalizar la función
+
+}
+
 void Ventas()
 {
+    int select;
+    do {
+        printf("Desea pagar con [1]Efectivo o [2]Tarjeta? \n");
+        scanf("%d", &select);
+        getchar();
+        switch(select) {
+            case 1: {
+                printf("Cuantos tickets se vendieron? "); //ej un ticket es 50DOP
+                scanf("%d",&venta.cantidad);
 
-    printf("Cuanto se pago?  "); //ej 200DOP
-    scanf("%f",&venta.pago); //no tengo internet pa ver lo de fgets
-    printf("Cuantos tickets se vendieron? "); //ej un ticket es 50DOP
-    scanf("%d",&venta.cantidad);
+                // NOTA DEJAR UN APARTADO PARA PAGO INSUFICIENTE
+                printf("Cuanto se pago?  "); //ej 200DOP
+                scanf("%f",&venta.pago); //no tengo internet pa ver lo de fgets
 
-    venta.precio = 50 * venta.cantidad; //EJ 3 tickets x 50DOP = 150DOP
-    venta.devolucion = venta.pago - venta.precio;
-    FnSorting(venta.pago,true); FnSorting(venta.devolucion,false);
+                venta.cash = 50 * venta.cantidad; //EJ 3 tickets x 50DOP = 150DOP
+                venta.devolucion = venta.pago - venta.precio;
+                FnSorting(venta.pago,true); FnSorting(venta.devolucion,false);
+                break;
 
-    //(venta.precio) incrementa el valor de un acumulador (ventas totales) para el reporte de ventas diarias! (ง🔥ﾛ🔥)ง
+                //(venta.cash) incrementa el valor de un acumulador (ventas totales)
+                // para el reporte de ventas diarias! (ง🔥ﾛ🔥)ง
+            }
+            case 2: {
+                printf("Cuantos tickets se vendieron? "); //ej un ticket es 50DOP
+                scanf("%d",&venta.cantidad);
+                printf("Se recibieron %d pesos \n", 50 * venta.cantidad);
+                venta.card = 50 * venta.cantidad; //EJ 3 tickets x 50DOP = 150DOP
+                break;
+            }
+            default: {
+                printf("Opcion invalida \n"); break;
+            }
+        }
+    } while (select != 1 && select != 2);
     
 }
 
 void REGISventas(){
 
-    Ventas();
-     printf("Denominaciones:\n"
-           "Monedas de 1:       %d     Monedas de 5:        %d\n"
-           "Monedas de 10:      %d     Monedas de 25:       %d\n"
-           "Billetes de 50:     %d     Billetes de 100:     %d\n"
-           "Billetes de 200:    %d     Billetes de 500:     %d\n"
-           "Billetes de 1000:   %d     Billetes de 2000:    %d\n",
-           caja.m1,
-           caja.m5,
-           caja.m10,
-           caja.m25,
-           caja.b50,
-           caja.b100,
-           caja.b200,
-           caja.b500,
-           caja.b1000,
-           caja.b2000);
+    if (caja.operacion == 'A') {
+        Ventas();
+        printf("Denominaciones:\n"
+              "Monedas de 1:       %d     Monedas de 5:        %d\n"
+              "Monedas de 10:      %d     Monedas de 25:       %d\n"
+              "Billetes de 50:     %d     Billetes de 100:     %d\n"
+              "Billetes de 200:    %d     Billetes de 500:     %d\n"
+              "Billetes de 1000:   %d     Billetes de 2000:    %d\n",
+              caja.m1,
+              caja.m5,
+              caja.m10,
+              caja.m25,
+              caja.b50,
+              caja.b100,
+              caja.b200,
+              caja.b500,
+              caja.b1000,
+              caja.b2000);
+    } else {
+        printf("No puede realizar ventas. Debe abrir una caja primero.\n");
+    }
 }
 
 void FnSorting(int IN, bool ADD)
