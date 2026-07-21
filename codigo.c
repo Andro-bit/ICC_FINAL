@@ -52,6 +52,7 @@ void ApCiCaja(int N);
 void AperturaCaja();
 void CierreCaja();
 void Ventas();
+int NextSequence();
 void REGISventas();
 void DailySales();
 void menu();
@@ -59,7 +60,6 @@ void GuardarCaja();
 
 int main()
 {
-
     menu();
     return 0;
 }
@@ -121,7 +121,6 @@ void menu() {
 
 void ApCiCaja(int N) {
 
-    int nextSequence = 1000; // esto es para que la secuencia vaya aumentando
 
     // hice estos cambios because in order de hacer el reporte diario de ventas
     // necesito que las secuencias se registren y se guarden, ademas de que
@@ -130,11 +129,10 @@ void ApCiCaja(int N) {
         case 1:
             if (!OpenSale) {
                 caja.operacion = 'A';
-                caja.secuencia = nextSequence;
+                caja.secuencia = NextSequence();
                 AperturaCaja();
                 GuardarCaja();
                 OpenSale = true;
-                nextSequence++;
             } else printf("La caja ya esta abierta bro");
             break;
         case 2:
@@ -218,17 +216,21 @@ void AperturaCaja()
     printf("Cuantos billetes de 2000? ");
     scanf("%d", &a);
     caja.b2000 = a;
+
+    // VALIDAR INGRESO Y ASEGURAR (se recomienda que que sea una funcion)
 }
 
 void CierreCaja()
 {
-    
+    // ver lo que quedo, cuadrarlo con lo que vendi y ver cuanto gane
 }
 
 void GuardarCaja() {
     FILE *archivoCaja = fopen("caja.dat", "ab");
     if (archivoCaja == NULL) {
         printf("Error al abrir caja.dat\n");
+        // hacer un ciclo pa intentarlo volver a abrir
+        // aunque sea por dos intentos, decirle al usuario q es su culpa
         return;
     }
     fwrite(&caja, sizeof(CAJA), 1, archivoCaja);
@@ -236,12 +238,50 @@ void GuardarCaja() {
     fclose(archivoCaja);
 }
 
+/* NextSequence() es una función encargada de obtener el número de secuencia que tendrá la próxima
+apertura de caja. Primero intenta abrir el archivo binario caja.dat
+en modo lectura. Si el archivo no existe, significa que nunca se ha registrado una caja, por lo que
+devuelve 1000 como la primera secuencia. Si el archivo existe, mueve el puntero hasta el inicio del último
+registro utilizando fseek(), lee esa última estructura CAJA con fread() y obtiene su campo secuencia.
+Finalmente, devuelve ese valor incrementado en uno, asegurando que cada nueva apertura de caja tenga
+una secuencia única y consecutiva, incluso si el programa se cierra y se vuelve a ejecutar. */
+
+int NextSequence() {
+
+    CAJA ultimaCaja;
+    FILE *archivoCaja = fopen("caja.dat", "rb");
+    if (archivoCaja == NULL) {
+		// this means it's the first time so it's a 1000
+        return 1000;
+    }
+
+	// comienza a leer archivo Caja desde el final pero retrocede exactamente el size
+	// de un struct y asi encuentra el ultimo
+    fseek(archivoCaja, -sizeof(CAJA), SEEK_END);
+
+	// Lee la info de la variable temporal ultimaCaja de tipo caja
+	// en el lugar que encontre
+    fread(&ultimaCaja, sizeof(CAJA), 1, archivoCaja);
+
+    fclose(archivoCaja);
+
+	// devuelve ultima secuencia mas uno
+    return ultimaCaja.secuencia + 1;
+
+}
+
+
 void DailySales() {
     // Abrir el archivo binario de ventas en modo lectura
-    // Verificar si el archivo existe
+    // Verificar si el archivo existe (y si no pues crear)
     // Si el archivo no existe, mostrar un mensaje y terminar la función
 
     // Imprimir el encabezado del reporte
+    // LOOP POR DONDE F SEEK SE VA MOVIENDO HASTA ENCONTRAR FINAL FILE
+    // HACER PAGINACION
+
+    // no te lleves de
+    // el gpt k taba alucinando :(
 
     // Inicializar:
     //     cajaAnterior = -1

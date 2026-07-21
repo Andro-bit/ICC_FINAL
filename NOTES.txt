@@ -73,3 +73,24 @@ Total tarjeta
 Total caja
 
 =================================
+
+    switch (N) {
+        case 1:
+            if (!OpenSale) {
+                caja.operacion = 'A';
+                caja.secuencia = NextSequence();
+                AperturaCaja();
+                GuardarCaja();
+                OpenSale = true;
+            } else printf("La caja ya esta abierta bro");
+            break;
+        case 2:
+            if (OpenSale) {
+                caja.operacion = 'C';
+                CierreCaja();
+                GuardarCaja();
+                OpenSale = false;
+                break;
+            }
+        default: caja.operacion = '?'; break;
+    }
