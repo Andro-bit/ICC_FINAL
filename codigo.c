@@ -47,11 +47,14 @@ typedef struct
 
 CAJA caja;
 bool OpenSale = false;
+
 void FnSorting(int IN, bool ADD);
 void ApCiCaja(int N);
 void AperturaCaja();
 void CierreCaja();
 void Ventas();
+void PrintReport(VENTA Placeholder);
+void PrintTotal(int E, int C, int T);
 int NextSequence();
 void REGISventas();
 void DailySales();
@@ -217,25 +220,62 @@ void AperturaCaja()
     scanf("%d", &a);
     caja.b2000 = a;
 
-    // VALIDAR INGRESO Y ASEGURAR (se recomienda que que sea una funcion)
+    // VALIDAR INGRESO Y ASEGURAR (se recomienda que que sea una funcion) - Tarea de Andrey
 }
 
 void CierreCaja()
 {
-    // ver lo que quedo, cuadrarlo con lo que vendi y ver cuanto gane
+    // ver lo que quedo, cuadrarlo con lo que vendi y ver cuanto gane - Tarea de Andrey
 }
 
+
 void GuardarCaja() {
-    FILE *archivoCaja = fopen("caja.dat", "ab");
+    FILE *archivoCaja = NULL;
+    int intentos = 0;
+
+    // Se agregó un ciclo while que intenta abrir el archivo hasta 3 veces antes de cancelar la operación.
+    // Si después de esos intentos fopen() sigue devolviendo NULL, se muestra un mensaje de error al usuario
+    // y la función termina sin intentar escribir en el archivo.
+
+    while (archivoCaja == NULL && intentos < 3) {
+        archivoCaja = fopen("caja.dat", "ab");
+
+        if (archivoCaja == NULL) {
+            intentos++;
+
+            if (intentos < 3) {
+                printf("No se pudo abrir caja.dat. Reintentando (%d/3)...\n", intentos + 1);
+            }
+        }
+    }
+
     if (archivoCaja == NULL) {
-        printf("Error al abrir caja.dat\n");
-        // hacer un ciclo pa intentarlo volver a abrir
-        // aunque sea por dos intentos, decirle al usuario q es su culpa
+        printf("Error: no fue posible abrir caja.dat despues de 3 intentos.\n");
+        printf("Verifique que el archivo no este siendo usado por otro programa o que tenga permisos de escritura.\n");
         return;
     }
+
+    FILE *ventasCaja = NULL;
+    int try = 0;
+
+    while (ventasCaja == NULL && try < 3) {
+        // Si el archivo no existe, mostrar un mensaje y terminar la función
+        ventasCaja = fopen("ventas.dat", "ab");
+
+        if (ventasCaja == NULL) {
+            try++;
+
+            if (intentos < 3) {
+                printf("No se pudo abrir caja.dat. Reintentando (%d/3)...\n", intentos + 1);
+            }
+        }
+    }
+
+    // guardar caja y venta
+    fwrite(&venta, sizeof(VENTA), 1, ventasCaja);
     fwrite(&caja, sizeof(CAJA), 1, archivoCaja);
-    // escribir caja en archivo caja
     fclose(archivoCaja);
+    fclose(ventasCaja);
 }
 
 /* NextSequence() es una función encargada de obtener el número de secuencia que tendrá la próxima
@@ -270,74 +310,79 @@ int NextSequence() {
 
 }
 
+/* La función DailySales() genera el historial de ventas recorriendo todas las secuencias de caja desde la más reciente
+ * hasta la primera registrada. Para cada secuencia, reinicia los acumuladores de efectivo, tarjeta y ganancias, vuelve
+ * al inicio del archivo ventas.dat y lee cada venta con fread(). Si la venta pertenece a la secuencia actual, la
+ * imprime mediante PrintReport() y acumula sus valores. Cuando termina de revisar all of el archivo para esa secuencia,
+ * imprime un resumen con los totales usando PrintTotal(). Este proceso se repite para cada apertura de caja, permitiendo
+ * mostrar el historial agrupado por secuencia sin modificar la información almacenada en el archivo. */
 
 void DailySales() {
-    // Abrir el archivo binario de ventas en modo lectura
-    // Verificar si el archivo existe (y si no pues crear)
-    // Si el archivo no existe, mostrar un mensaje y terminar la función
 
-    // Imprimir el encabezado del reporte
-    // LOOP POR DONDE F SEEK SE VA MOVIENDO HASTA ENCONTRAR FINAL FILE
-    // HACER PAGINACION
+    printf("Bienvenido al registro de ventas \n");
 
-    // no te lleves de
-    // el gpt k taba alucinando :(
+    FILE *ventasCaja = fopen("ventas.dat", "rb");
 
-    // Inicializar:
-    //     cajaAnterior = -1
-    //     totalEfectivo = 0
-    //     totalTarjeta = 0
-    //     totalGeneral = 0
+    if (ventasCaja == NULL) {
+        printf("No existen ventas registradas.\n");
+        return;
+    }
 
-    // Leer el primer registro de venta
+    VENTA tempSale;
 
-    // Mientras exista una venta válida
+    int efectivo;
+    int tarjeta;
+    int gananciasTotales;
+    bool ventaEncontrada;
 
-    // Si la secuencia de la venta es diferente de cajaAnterior
+    int LastSequence = NextSequence() - 1;
 
-    // Si NO es la primera caja encontrada
+    // recorrer secuencias
+    for (int secuencia = LastSequence; secuencia >= 1000; secuencia--) {
 
-    // Imprimir el total de efectivo de la caja anterior
-    // Imprimir el total de tarjeta de la caja anterior
-    // Imprimir el total general de la caja anterior
-    // Imprimir una línea separadora
+        ventaEncontrada = false;
+        efectivo = 0;
+        tarjeta = 0;
+        gananciasTotales = 0;
 
-    // Actualizar cajaAnterior con la nueva secuencia
+        // Vuelve el puntero al inicio
+        rewind(ventasCaja);
 
-    // Reiniciar:
-    //     totalEfectivo = 0
-    //     totalTarjeta = 0
-    //     totalGeneral = 0
+        while (fread(&tempSale, sizeof(VENTA), 1, ventasCaja) == 1) {
 
-    // Imprimir:
-    //     Número de caja
-    //     Fecha (N/A por ahora)
+            if (tempSale.secuencia == secuencia) {
 
-    // Imprimir los datos de la venta:
-    //     Cantidad de boletos
-    //     Precio
-    //     Forma de pago
-    //     Pago recibido
-    //     Devolución
+                // se le suma lo que conseguimos a los acumuladores
+                efectivo += tempSale.cash;
+                tarjeta += tempSale.card;
+                gananciasTotales += tempSale.cash + tempSale.card;
 
-    // Sumar el efectivo recibido al totalEfectivo
+                PrintReport(tempSale);
+                ventaEncontrada = true;
+            }
+        }
 
-    // Sumar los pagos con tarjeta al totalTarjeta
+        if (ventaEncontrada) {
+            PrintTotal(efectivo, tarjeta, gananciasTotales);
+        }
 
-    // Sumar el valor de la venta al totalGeneral
+    }
 
-    // Leer la siguiente venta
+    fclose(ventasCaja);
+}
 
-    // Al terminar el recorrido
+void PrintReport(VENTA Placeholder) {
+    printf(" Caja No. %d \n", Placeholder.secuencia);
+    printf("Fecha XXXX \n"); // no loco hagan ustedes lo de fecha que me di cuenta que el struct de VENTA ni fecha tiene
+    printf("Monto recibido en efectivo %d \n", Placeholder.cash);
+    printf("Monto recibido en tarjeta %d \n", Placeholder.card);
+    printf("Total venta %d \n", Placeholder.cash + Placeholder.card);
+}
 
-    // Si se imprimió al menos una caja
-
-    // Imprimir los totales de la última caja
-
-    // Cerrar el archivo
-
-    // Finalizar la función
-
+void PrintTotal(int E, int C, int T) {
+    printf("Total dinero Efectivo secuencia: %d \n", E);
+    printf("Total dinero Tarjeta secuencia: %d \n", C);
+    printf("Total dinero secuencia: %d \n", T);
 }
 
 void Ventas()
@@ -357,7 +402,7 @@ void Ventas()
                 scanf("%f",&venta.pago); //no tengo internet pa ver lo de fgets
 
                 venta.cash = 50 * venta.cantidad; //EJ 3 tickets x 50DOP = 150DOP
-                venta.devolucion = venta.pago - venta.precio;
+                venta.devolucion = venta.pago - venta.cash;
                 FnSorting(venta.pago,true); FnSorting(venta.devolucion,false);
                 break;
 
@@ -376,13 +421,14 @@ void Ventas()
             }
         }
     } while (select != 1 && select != 2);
-    
 }
 
 void REGISventas(){
 
     if (caja.operacion == 'A') {
         Ventas();
+        venta.secuencia = caja.secuencia;
+        GuardarCaja();
         printf("Denominaciones:\n"
               "Monedas de 1:       %d     Monedas de 5:        %d\n"
               "Monedas de 10:      %d     Monedas de 25:       %d\n"

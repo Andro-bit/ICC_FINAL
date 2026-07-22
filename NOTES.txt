@@ -74,6 +74,7 @@ Total caja
 
 =================================
 
+
     switch (N) {
         case 1:
             if (!OpenSale) {
